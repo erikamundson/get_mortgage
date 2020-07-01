@@ -23,7 +23,7 @@ struct finals{
     double yes_mortgage;
 };
 
-finals calculate_mortgage(int years, double down, double mortgage, double apr, double capital, double annual_return, double yearly_dividends, double quarterly_dividends, double biannual_dividends, double monthly_dividends);
+finals calculate_mortgage(int years, double down, double mortgage, double apr, double capital, double annual_return2);
 
 void do_mortgage();
 #endif /* functions_hpp */

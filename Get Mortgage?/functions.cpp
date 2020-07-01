@@ -43,14 +43,14 @@ double get_monthly_payment(double down, double apr, double mortgage, int years){
     double monthly_payment = 0;
     double r = apr/12;
     int n = years * 12;
-    double discount_factor = ((1+r)* n - 1) / (r * (1 + r) * n);
+    double discount_factor = (pow((1+r), n) - 1) / (r * pow((1 + r), n));
     monthly_payment = mortgage/discount_factor;
     return monthly_payment;
 }
 
 struct finals;
 
-finals calculate_mortgage(int years, double down, double mortgage, double apr, double capital, double annual_return, double yearly_dividends, double quarterly_dividends, double biannual_dividends, double monthly_dividends){
+finals calculate_mortgage(int years, double down, double mortgage, double apr, double capital, double annual_return){
     //declare some variables
     double monthly_return = annual_return/12;
     int months = years*12;
@@ -58,28 +58,11 @@ finals calculate_mortgage(int years, double down, double mortgage, double apr, d
     double house_price = down + mortgage;
     double no_mortgage = capital - house_price;
     double yes_mortgage = capital - down;
-    double dividends;
     //
-    
-    for (int i = 1; i<= months; i++){
-        if(i%12 == 0){
-            dividends = yearly_dividends + monthly_dividends + quarterly_dividends + biannual_dividends;
-            no_mortgage += dividends;
-            yes_mortgage += dividends;
-        }
-        else if (i%6 == 0){
-            dividends = biannual_dividends + quarterly_dividends + monthly_dividends;
-            no_mortgage += dividends;
-            yes_mortgage += dividends;
-        }
-        else if (i%3 ==0){
-            dividends = quarterly_dividends + monthly_dividends;
-            no_mortgage += dividends;
-            yes_mortgage += dividends;
-        } else {
-            no_mortgage += monthly_dividends;
-            yes_mortgage += monthly_dividends;
-        }
+    double mortgage_remaining = mortgage;
+    for (int i = 1; i <= months; i++){
+        mortgage_remaining *= (1 + apr/12);
+        mortgage_remaining -= monthly_payment;
         yes_mortgage -= monthly_payment;
         yes_mortgage *= (1 + monthly_return);
         no_mortgage *= (1 + monthly_return);
@@ -97,10 +80,6 @@ void do_mortgage(){
     double capital;
     double apr;
     double annual_return;
-    double yearly_dividends;
-    double biannual_dividends;
-    double quarterly_dividends;
-    double monthly_dividends;
     cout << "\nWhat is the house price? $";
     cin >> house_price;
     cout << "\nWhat is your down payment? $";
@@ -116,17 +95,10 @@ void do_mortgage(){
     cout << "\nWhat is your expected annual return in % ? ";
     cin >> annual_return;
     annual_return = annual_return/100;
-    cout << "\nWhat is your expected total yearly dividend? $";
-    cin >> yearly_dividends;
-    cout << "\nWhat is your expected total biannual dividend? $";
-    cin >> biannual_dividends;
-    cout << "\nWhat is your expected total quarterly dividend? $";
-    cin >> quarterly_dividends;
-    cout << "\nWhat is your expected total monthly dividend? $";
-    cin >> monthly_dividends;
+
     
     //get number values
-    struct finals x = calculate_mortgage(years, down, mortgage, apr, capital, annual_return, yearly_dividends, quarterly_dividends, biannual_dividends, monthly_dividends);
+    struct finals x = calculate_mortgage(years, down, mortgage, apr, capital, annual_return);
     
     double no_mortgage = x.no_mortgage;
     double yes_mortgage = x.yes_mortgage;
